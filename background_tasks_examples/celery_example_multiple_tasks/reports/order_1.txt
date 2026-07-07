@@ -1,0 +1,11 @@
+ABC STORE
+========================================
+Generated On : 2026-07-07 17:52:33.527532
+
+Order ID     : 1
+Customer     : abc
+Email        : def@gmail.com
+Product      : Laptop
+Quantity     : 2
+Price        : $50000
+Total Amount : $100000
