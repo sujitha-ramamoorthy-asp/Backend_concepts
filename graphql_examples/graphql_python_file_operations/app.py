@@ -1,0 +1,4 @@
+from strawberry.asgi import GraphQL
+from schema import schema
+
+app = GraphQL(schema)
