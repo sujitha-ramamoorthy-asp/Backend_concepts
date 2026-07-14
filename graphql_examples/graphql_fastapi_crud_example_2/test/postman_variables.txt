@@ -1,0 +1,147 @@
+Postman supports GraphQL natively, and it separates the GraphQL query from the variables, just like GraphQL Playground or Apollo Sandbox.
+
+Suppose your mutation is:
+
+mutation CreateEmployee($input: EmployeeInput!) {
+
+  createEmployee(input: $input) {
+
+    id
+    name
+    salary
+
+    department {
+      id
+      name
+    }
+
+  }
+
+}
+
+In Postman:
+
+Step 1: Select GraphQL
+Open Postman
+Create a new request
+Set the method to POST
+URL:
+http://localhost:8000/graphql
+Click Body
+Select GraphQL
+
+You'll see two editors:
+
+Query
+GraphQL Variables
+Step 2: Query
+
+Paste only the GraphQL operation:
+
+mutation CreateEmployee($input: EmployeeInput!) {
+
+  createEmployee(input: $input) {
+
+    id
+    name
+    salary
+
+    department {
+      id
+      name
+    }
+
+  }
+
+}
+Step 3: Variables
+
+Paste this JSON into the GraphQL Variables section:
+
+{
+  "input": {
+    "name": "John",
+    "salary": 60000,
+    "departmentId": 1
+  }
+}
+
+Click Send.
+
+Query Example
+
+Query editor:
+
+query GetEmployees($departmentId: Int!, $page: Int!) {
+
+  employees(
+    departmentId: $departmentId
+    page: $page
+  ) {
+
+    totalCount
+
+    items {
+      id
+      name
+      salary
+    }
+
+  }
+
+}
+
+Variables:
+
+{
+  "departmentId": 1,
+  "page": 1
+}
+What Postman Actually Sends
+
+Behind the scenes, Postman sends an HTTP POST request like this:
+
+Headers
+
+Content-Type: application/json
+Authorization: Bearer <your_jwt_token>
+
+Body
+
+{
+  "query": "mutation CreateEmployee($input: EmployeeInput!) { createEmployee(input: $input) { id name salary department { id name } } }",
+  "variables": {
+    "input": {
+      "name": "John",
+      "salary": 60000,
+      "departmentId": 1
+    }
+  }
+}
+
+Notice the two top-level fields:
+
+"query" → the GraphQL operation
+"variables" → the values used by that operation
+Without Variables
+
+If you don't use variables, Postman sends:
+
+{
+  "query": "mutation { createEmployee(input:{name:\"John\", salary:60000, departmentId:1}) { id name } }"
+}
+
+There is no "variables" field because the values are embedded directly in the query.
+
+Why Production Applications Prefer Variables
+
+Frameworks such as:
+
+React + Apollo Client
+Angular Apollo
+Relay
+GraphQL Code Generator
+Postman
+Insomnia
+
+typically send requests in the same format:

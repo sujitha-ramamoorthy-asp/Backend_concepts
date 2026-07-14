@@ -1,0 +1,734 @@
+What is a Fragment?
+
+A Fragment is a reusable set of fields.
+
+Suppose every query returns an employee like this:
+
+id
+name
+salary
+department {
+  id
+  name
+}
+
+Instead of writing these fields repeatedly, define them once as a fragment.
+
+Without Fragment
+query {
+
+  employees {
+
+    items {
+
+      id
+
+      name
+
+      salary
+
+      department {
+
+        id
+
+        name
+
+      }
+
+    }
+
+  }
+
+}
+
+Now imagine another query:
+
+query {
+
+  department(id: 1) {
+
+    employees {
+
+      id
+
+      name
+
+      salary
+
+      department {
+
+        id
+
+        name
+
+      }
+
+    }
+
+  }
+
+}
+
+You've duplicated the same employee fields.
+
+With Fragment
+
+Define a fragment once:
+
+fragment EmployeeFields on EmployeeType {
+
+  id
+
+  name
+
+  salary
+
+  department {
+
+    id
+
+    name
+
+  }
+
+}
+
+Now use it.
+
+query {
+
+  employees {
+
+    items {
+
+      ...EmployeeFields
+
+    }
+
+  }
+
+}
+
+fragment EmployeeFields on EmployeeType {
+
+  id
+
+  name
+
+  salary
+
+  department {
+
+    id
+
+    name
+
+  }
+
+}
+
+The response is exactly the same.
+
+Another Example
+
+Suppose you have:
+
+query {
+
+  departments {
+
+    id
+
+    name
+
+    employees {
+
+      ...EmployeeFields
+
+    }
+
+  }
+
+}
+
+fragment EmployeeFields on EmployeeType {
+
+  id
+
+  name
+
+  salary
+
+}
+
+Instead of repeating:
+
+id
+name
+salary
+
+everywhere, you reference:
+
+...EmployeeFields
+Multiple Queries Using One Fragment
+query {
+
+  employees {
+
+    items {
+
+      ...EmployeeFields
+
+    }
+
+  }
+
+}
+
+fragment EmployeeFields on EmployeeType {
+
+  id
+
+  name
+
+  salary
+
+}
+
+Another query:
+
+query {
+
+  departments {
+
+    employees {
+
+      ...EmployeeFields
+
+    }
+
+  }
+
+}
+
+fragment EmployeeFields on EmployeeType {
+
+  id
+
+  name
+
+  salary
+
+}
+
+The fragment can be reused anywhere the GraphQL type is EmployeeType.
+
+How GraphQL Executes It
+
+GraphQL internally expands the fragment.
+
+You write:
+
+...EmployeeFields
+
+GraphQL treats it as if you had written:
+
+id
+
+name
+
+salary
+
+department {
+
+  id
+
+  name
+
+}
+
+So fragments are purely a query-writing convenience—they don't change your server or schema.
+
+Why Use Fragments?
+
+Imagine EmployeeType grows to:
+
+EmployeeType
+
+id
+name
+salary
+email
+phone
+city
+state
+country
+joiningDate
+designation
+department
+manager
+address
+
+Without fragments, you'd repeat all of those fields in every query.
+
+With fragments:
+
+fragment EmployeeFields on EmployeeType {
+
+  id
+
+  name
+
+  salary
+
+  email
+
+  phone
+
+  department {
+
+    id
+
+    name
+
+  }
+
+}
+
+Every query simply includes:
+
+...EmployeeFields
+Fragment with Variables
+
+Fragments work together with variables.
+
+query GetEmployees($departmentId: Int!) {
+
+  employees(
+    departmentId: $departmentId
+  ) {
+
+    items {
+
+      ...EmployeeFields
+
+    }
+
+  }
+
+}
+
+fragment EmployeeFields on EmployeeType {
+
+  id
+
+  name
+
+  salary
+
+}
+
+Variables:
+
+{
+  "departmentId": 1
+}
+Do We Need Code Changes?
+
+No.
+
+Fragments are a client-side GraphQL feature.
+
+Your existing:
+
+FastAPI code
+Strawberry schema
+Service layer
+Repository layer
+
+remain unchanged.
+
+Real-World Usage
+
+In a React application with Apollo Client, it's common to define fragments in separate files and reuse them across queries and mutations.
+
+For example:
+
+# employee.fragment.graphql
+
+fragment EmployeeFields on EmployeeType {
+
+  id
+
+  name
+
+  salary
+
+  department {
+
+    id
+
+    name
+
+  }
+
+}
+
+Then:
+
+# employees.query.graphql
+
+query GetEmployees {
+
+  employees {
+
+    items {
+
+      ...EmployeeFields
+
+    }
+
+  }
+
+}
+
+and
+
+# department.query.graphql
+
+query GetDepartments {
+
+  departments {
+
+    employees {
+
+      ...EmployeeFields
+
+    }
+
+  }
+
+}
+
+This keeps GraphQL operations consistent and easier to maintain.
+
+What comes next?
+
+The next logical topic is Aliases.
+
+Aliases let you call the same field multiple times with different arguments in a single GraphQL request—for example, retrieving IT employees and HR employees in one query without naming conflicts. This is another feature that's used frequently in real-world GraphQL applications.
+explain this fragment EmployeeFields on EmployeeType {
+
+This is the most important line in a GraphQL fragment.
+
+fragment EmployeeFields on EmployeeType {
+
+Let's break it into pieces.
+
+Complete Fragment
+fragment EmployeeFields on EmployeeType {
+
+  id
+
+  name
+
+  salary
+
+}
+
+Think of it as creating a reusable template.
+
+Part 1: fragment
+fragment
+
+This keyword tells GraphQL:
+
+"I'm defining a reusable group of fields."
+
+It's similar to creating a reusable function or constant.
+
+Python analogy:
+
+employee_fields = [
+    "id",
+    "name",
+    "salary"
+]
+Part 2: EmployeeFields
+fragment EmployeeFields
+
+This is the name of the fragment.
+
+You can choose almost any valid name.
+
+Examples:
+
+fragment BasicEmployee
+fragment EmployeeSummary
+fragment EmployeeDetails
+
+It's just like naming a function.
+
+Later you'll use:
+
+...EmployeeFields
+Part 3: on
+
+This is the most confusing part for beginners.
+
+on
+
+means
+
+"This fragment belongs to this GraphQL type."
+
+Think of it as saying:
+
+"Use these fields when the object is an EmployeeType."
+
+Part 4: EmployeeType
+on EmployeeType
+
+This must match a GraphQL type in your schema.
+
+For example, your Strawberry type:
+
+@strawberry.type
+class EmployeeType:
+
+    id: int
+
+    name: str
+
+    salary: int
+
+    department: DepartmentType
+
+becomes this GraphQL type:
+
+type EmployeeType {
+
+    id: Int!
+
+    name: String!
+
+    salary: Int!
+
+    department: DepartmentType!
+
+}
+
+The fragment says:
+
+These fields are valid whenever GraphQL is returning an EmployeeType.
+
+Then comes the fields
+fragment EmployeeFields on EmployeeType {
+
+    id
+
+    name
+
+    salary
+
+}
+
+GraphQL remembers
+
+EmployeeFields
+
+↓
+
+id
+name
+salary
+Using the Fragment
+
+Instead of writing
+
+query {
+
+  employees {
+
+    items {
+
+      id
+
+      name
+
+      salary
+
+    }
+
+  }
+
+}
+
+you write
+
+query {
+
+  employees {
+
+    items {
+
+      ...EmployeeFields
+
+    }
+
+  }
+
+}
+
+fragment EmployeeFields on EmployeeType {
+
+    id
+
+    name
+
+    salary
+
+}
+
+GraphQL internally expands it.
+
+Python Analogy
+
+Suppose in Python you repeatedly create the same dictionary.
+
+Instead of:
+
+employee = {
+
+    "id": emp.id,
+
+    "name": emp.name,
+
+    "salary": emp.salary
+
+}
+
+everywhere,
+
+you create a helper:
+
+def employee_fields(emp):
+
+    return {
+
+        "id": emp.id,
+
+        "name": emp.name,
+
+        "salary": emp.salary
+
+    }
+
+GraphQL fragments are similar: they let you define a reusable set of fields.
+
+Why on EmployeeType?
+
+Imagine you also have:
+
+type DepartmentType {
+
+    id
+
+    name
+
+}
+
+This fragment:
+
+fragment EmployeeFields on EmployeeType
+
+cannot be used on a DepartmentType.
+
+For example, this is invalid:
+
+query {
+
+  departments {
+
+    ...EmployeeFields
+
+  }
+
+}
+
+because DepartmentType doesn't have the fields defined for EmployeeType.
+
+The on EmployeeType clause tells GraphQL exactly which type the fragment applies to.
+
+Visual Representation
+EmployeeType
+│
+├── id
+├── name
+├── salary
+└── department
+
+Your fragment:
+
+fragment EmployeeFields on EmployeeType {
+
+    id
+
+    name
+
+    salary
+
+}
+
+selects:
+
+EmployeeType
+│
+├── ✔ id
+├── ✔ name
+├── ✔ salary
+└── department
+Another Example
+
+Suppose you have:
+
+type DepartmentType {
+
+    id
+
+    name
+
+    location
+
+}
+
+You can create another fragment:
+
+fragment DepartmentFields on DepartmentType {
+
+    id
+
+    name
+
+    location
+
+}
+
+Notice:
+
+EmployeeFields → works only with EmployeeType
+DepartmentFields → works only with DepartmentType
+
+Each fragment is tied to a specific GraphQL type.
+
+A simple way to remember it
+
+Read the line like this:
+
+fragment EmployeeFields on EmployeeType
+
+as:
+
+"Create a reusable field set named EmployeeFields that can be used whenever the object being returned is an EmployeeType."
+
+This interpretation will make fragments much easier to understand as you start using them in larger GraphQL queries.

@@ -1,0 +1,19 @@
+3. Postman
+
+Method
+
+POST
+
+URL
+
+http://127.0.0.1:8000/graphql
+Headers
+Key	Value
+Content-Type	application/json
+Authorization	Bearer eyJhbGc...
+Body → Raw → JSON
+{
+    "query":"query{ employees{ id name salary } }"
+}
+
+Click Send.

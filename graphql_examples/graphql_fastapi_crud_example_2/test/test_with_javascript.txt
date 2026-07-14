@@ -1,0 +1,37 @@
+const token = "YOUR_TOKEN";
+
+fetch("http://127.0.0.1:8000/graphql", {
+
+    method: "POST",
+
+    headers: {
+
+        "Content-Type":"application/json",
+
+        "Authorization":"Bearer " + token
+
+    },
+
+    body: JSON.stringify({
+
+        query: `
+            query{
+
+                employees{
+
+                    id
+
+                    name
+
+                    salary
+
+                }
+
+            }
+        `
+
+    })
+
+})
+.then(r => r.json())
+.then(console.log);
